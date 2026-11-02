@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบตั้งค่าและสร้างลิงก์ห้องเรียน - Eco Guardian</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Kanit', sans-serif; }</style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4">
+  <div class="max-w-xl w-full bg-slate-900 border border-emerald-500/30 rounded-3xl p-6 md:p-8 shadow-2xl space-y-6">
+    <div class="text-center space-y-2">
+      <div class="w-14 h-14 bg-emerald-500/10 border border-emerald-500/40 rounded-2xl flex items-center justify-center text-3xl mx-auto">⚙️</div>
+      <h1 class="text-2xl font-bold text-emerald-400">ระบบสร้างลิงก์ห้องเรียน</h1>
+      <p class="text-xs text-slate-400">กรอกข้อมูลชีตและโรงเรียนของคุณครู เพื่อสร้างลิงก์และ QR Code ให้นักเรียน</p>
+    </div>
+
+    <div class="space-y-4">
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">1. ลิงก์ Web App URL จาก Google Apps Script (ลงท้ายด้วย /exec)</label>
+        <input type="url" id="input-api" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:border-emerald-500 focus:outline-none">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">2. ชื่อโรงเรียน (จะแสดงบนหัวเกียรติบัตร)</label>
+        <input type="text" id="input-school" placeholder="เช่น โรงเรียนมัธยมวิทยาคม" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-emerald-500 focus:outline-none">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">3. ชื่อ-นามสกุล คุณครูผู้สอน (จะแสดงบนเกียรติบัตร)</label>
+        <input type="text" id="input-teacher" placeholder="เช่น คุณครูใจดี สอนวิทย์" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-emerald-500 focus:outline-none">
+      </div>
+
+      <button onclick="generateLinks()" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl shadow-lg transition-all text-sm">
+        🚀 สร้างลิงก์เกมและ QR Code
+      </button>
+    </div>
+
+    <!-- Output Box -->
+    <div id="output-box" class="space-y-4 hidden border-t border-slate-800 pt-6">
+      <div>
+        <label class="block text-xs font-semibold text-emerald-400 mb-1">ลิงก์เกมสำหรับส่งให้นักเรียน:</label>
+        <div class="flex gap-2">
+          <input type="text" id="output-url" readonly class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none">
+          <button onclick="copyUrl()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold whitespace-nowrap">คัดลอก</button>
+        </div>
+      </div>
+
+      <div class="text-center pt-2">
+        <label class="block text-xs font-semibold text-slate-400 mb-2">QR Code สำหรับฉายขึ้นสไลด์หน้าห้อง:</label>
+        <div class="inline-block p-3 bg-white rounded-2xl shadow-md">
+          <img id="output-qr" src="" alt="QR Code" class="w-48 h-48 mx-auto">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function generateLinks() {
+      const api = document.getElementById('input-api').value.trim();
+      const school = document.getElementById('input-school').value.trim();
+      const teacher = document.getElementById('input-teacher').value.trim();
+
+      if (!api || !api.includes('/exec')) {
+        return alert('กรุณากรอกลิงก์ Web App URL ที่ลงท้ายด้วย /exec ให้ถูกต้อง');
+      }
+
+      // ดึง Base URL ของตัวเกม (index.html ที่อยู่ในโฟลเดอร์เดียวกัน)
+      const currentUrl = window.location.href;
+      const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1) + 'index.html';
+
+      const finalUrl = `${baseUrl}?api=${encodeURIComponent(api)}&school=${encodeURIComponent(school || 'โรงเรียน')}&teacher=${encodeURIComponent(teacher || 'ครูผู้สอน')}`;
+
+      document.getElementById('output-url').value = finalUrl;
+      document.getElementById('output-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(finalUrl)}`;
+      document.getElementById('output-box').classList.remove('hidden');
+    }
+
+    function copyUrl() {
+      const copyText = document.getElementById("output-url");
+      copyText.select();
+      navigator.clipboard.writeText(copyText.value);
+      alert("คัดลอกลิงก์เรียบร้อยแล้ว ส่งให้นักเรียนได้เลยครับ!");
+    }
+  </script>
+</body>
+</html>
