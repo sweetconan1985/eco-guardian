@@ -35,7 +35,10 @@
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-xl shadow-md shadow-emerald-500/20">🌱</div>
       <div>
-        <h1 class="text-lg md:text-xl font-bold bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent font-tech tracking-wider">ECO-GUARDIAN ม.3</h1>
+        <div class="flex items-center gap-2">
+          <h1 class="text-lg md:text-xl font-bold bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent font-tech tracking-wider">ECO-GUARDIAN ม.3</h1>
+          <span id="demo-badge" class="hidden text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full font-tech font-bold">DEMO MODE</span>
+        </div>
         <p class="text-xs text-slate-400">สสวท. วิทยาศาสตร์ 12 ภารกิจพิทักษ์สมดุลโลก</p>
       </div>
     </div>
@@ -54,12 +57,12 @@
       <div class="text-center mb-6">
         <div class="w-16 h-16 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-3">🛡️</div>
         <h2 class="text-2xl font-bold text-white font-tech">เข้าสู่ระบบผู้พิทักษ์</h2>
-        <p class="text-xs text-slate-400 mt-1">กรอกรหัสนักเรียนเพื่อโหลดคะแนนและด่านที่เล่นค้างไว้</p>
+        <p id="login-subtext" class="text-xs text-slate-400 mt-1">กรอกรหัสนักเรียนเพื่อโหลดคะแนนและด่านที่เล่นค้างไว้</p>
       </div>
 
       <div class="space-y-4">
         <div>
-          <label class="block text-xs font-semibold text-emerald-400 mb-1">รหัสประจำตัวนักเรียน</label>
+          <label class="block text-xs font-semibold text-emerald-400 mb-1">รหัสประจำตัวนักเรียน (สำหรับทดลองเล่น ใส่เลขใดก็ได้ เช่น 1)</label>
           <input type="text" id="input-student-id" placeholder="เช่น 10001" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white font-tech focus:border-emerald-500 focus:outline-none">
         </div>
         <div id="extra-info-box" class="space-y-3 hidden">
@@ -119,7 +122,6 @@
 
     <div id="arena-card" class="bg-gradient-to-b from-slate-900 to-slate-950 rounded-3xl p-6 border border-slate-800 shadow-2xl relative overflow-hidden">
       <div class="grid grid-cols-2 gap-4 items-center mb-6">
-        <!-- Player Stats -->
         <div class="space-y-2">
           <div class="flex items-center justify-between text-xs font-tech">
             <span class="text-emerald-400 font-bold flex items-center gap-1">🛡️ ผู้พิทักษ์</span>
@@ -130,7 +132,6 @@
           </div>
         </div>
 
-        <!-- Monster Stats -->
         <div class="space-y-2 text-right">
           <div class="flex items-center justify-between text-xs font-tech">
             <span id="boss-hp-text" class="text-slate-300">100 / 100</span>
@@ -142,7 +143,6 @@
         </div>
       </div>
 
-      <!-- Question Card -->
       <div class="bg-slate-900/90 rounded-2xl p-5 border border-slate-700/60 mb-5 relative">
         <div id="q-context" class="text-xs text-amber-300/90 font-medium mb-1.5 flex items-center gap-1.5">
           <span>🔬 สถานการณ์จำลอง:</span>
@@ -150,7 +150,6 @@
         <p id="q-text" class="text-sm md:text-base text-slate-100 font-medium leading-relaxed">คำถามกำลังโหลด...</p>
       </div>
 
-      <!-- Choices -->
       <div id="choices-grid" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
     </div>
   </main>
@@ -172,7 +171,7 @@
     <div class="bg-slate-900 border border-emerald-500/50 rounded-3xl p-6 max-w-sm w-full shadow-2xl text-center">
       <div class="text-5xl mb-3">🎉</div>
       <h3 class="text-xl font-bold font-tech text-emerald-400 mb-1">พิชิตด่านสำเร็จ!</h3>
-      <p id="stage-clear-msg" class="text-xs text-slate-400 mb-4">คุณผ่านการทดสอบด่านนี้แล้ว</p>
+      <p id="stage-clear-msg" class="text-xs text-slate-300 mb-4">คุณผ่านการทดสอบด่านนี้แล้ว</p>
       <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 mb-5 text-sm">
         คะแนนที่ได้ในด่านนี้: <span id="stage-score-val" class="font-bold font-tech text-emerald-400 text-lg">5/5</span>
       </div>
@@ -230,15 +229,22 @@
   </div>
 
   <script>
-    // 1. CONFIG & URL PARAMS
+    // 1. CONFIG, DEMO DETECTION & URL PARAMS
     const urlParams = new URLSearchParams(window.location.search);
     const SCRIPT_URL = urlParams.get('api') || 'https://script.google.com/macros/s/AKfycby9GmPaipA6hI3NUUdExtpUQ-x-uocaj0SxOveio3Zd_hXccJceIC0Naynp33ExjHgI/exec';
     const CUSTOM_SCHOOL = urlParams.get('school') || 'โรงเรียนมาตรฐานวิทยาศาสตร์ สสวท.';
     const CUSTOM_TEACHER = urlParams.get('teacher') || 'ครูผู้สอนวิทยาศาสตร์';
+    
+    // ตรวจจับโหมดทดลองเล่น (Demo)
+    const IS_DEMO = urlParams.get('demo') === 'true' || urlParams.get('demo') === '1' || urlParams.get('mode') === 'demo';
 
     document.addEventListener("DOMContentLoaded", () => {
       document.getElementById('cert-school-name').innerText = CUSTOM_SCHOOL;
       document.getElementById('cert-teacher-name').innerText = CUSTOM_TEACHER;
+      if (IS_DEMO) {
+        document.getElementById('demo-badge').classList.remove('hidden');
+        document.getElementById('login-subtext').innerText = "🎮 โหมดทดลองเล่น: ทดสอบระบบสู้บอสและบันทึกคะแนน (เฉพาะด่านที่ 1)";
+      }
     });
 
     // 2. DATA (12 STAGES)
@@ -742,7 +748,7 @@
       document.getElementById('sound-btn').innerText = soundEnabled ? "🔊 เสียง: เปิด" : "🔇 เสียง: ปิด";
     }
 
-    // 5. LOGIN & CLOUD SYSTEM (FIXED TIMEOUT & MODAL HIDE)
+    // 5. LOGIN & CLOUD SYSTEM
     async function handleLogin() {
       const idInput = document.getElementById('input-student-id');
       const id = idInput.value.trim();
@@ -752,7 +758,7 @@
       btn.innerText = "กำลังตรวจสอบข้อมูล...";
       btn.disabled = true;
 
-      // Check LocalStorage first
+      // Check LocalStorage
       const localData = localStorage.getItem(`eco_${id}`);
       if (localData) {
         try {
@@ -760,7 +766,7 @@
         } catch(e) {}
       }
 
-      // Check Google Sheets Cloud with 3.5s timeout
+      // Check Cloud with timeout
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 3500);
@@ -773,7 +779,7 @@
             name: json.name,
             room: json.room,
             no: json.no,
-            unlockedStage: Number(json.unlockedStage) || 1,
+            unlockedStage: IS_DEMO ? 1 : (Number(json.unlockedStage) || 1),
             stageScores: json.stageScores || {},
             totalScore: Number(json.totalScore) || 0
           };
@@ -785,8 +791,8 @@
         console.warn("Cloud offline or timeout, proceed:", err);
       }
 
-      // If user already saved locally, login directly
       if (currentUser && currentUser.name) {
+        if (IS_DEMO) currentUser.unlockedStage = 1;
         finishLogin();
         return;
       }
@@ -832,7 +838,8 @@
         modal.classList.add('hidden');
         modal.classList.remove('flex');
       }
-      document.getElementById('player-display-name').innerText = currentUser.name;
+      if (IS_DEMO) currentUser.unlockedStage = 1;
+      document.getElementById('player-display-name').innerText = currentUser.name + (IS_DEMO ? ' (ทดลองเล่น)' : '');
       document.getElementById('player-display-info').innerText = `${currentUser.room} เลขที่ ${currentUser.no}`;
       renderStageGrid();
       updateTotalScoreBadge();
@@ -881,25 +888,61 @@
       saveLocal();
     }
 
-    // 6. STAGE GRID
+    // 6. STAGE GRID (WITH DEMO LOCK)
     function renderStageGrid() {
       const grid = document.getElementById('stages-grid');
       grid.innerHTML = '';
 
       STAGES_DATA.forEach(stage => {
-        const isUnlocked = stage.id <= currentUser.unlockedStage;
+        const isDemoLocked = IS_DEMO && stage.id > 1;
+        const isUnlocked = !isDemoLocked && (stage.id <= currentUser.unlockedStage);
         const score = currentUser.stageScores[stage.id];
         const isCompleted = score !== undefined;
         const isBossStage = stage.id === 12;
 
         const card = document.createElement('div');
         card.className = `p-5 rounded-2xl border transition-all relative overflow-hidden flex flex-col justify-between ${
-          !isUnlocked 
+          isDemoLocked || !isUnlocked 
             ? 'bg-slate-900/40 border-slate-800/60 opacity-60' 
             : isBossStage 
               ? 'bg-gradient-to-br from-rose-950/40 via-slate-900 to-amber-950/30 border-rose-500/50 shadow-lg shadow-rose-950/30' 
               : 'bg-slate-900/80 border-slate-800 hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-950/20'
         }`;
+
+        let statusBadge = '';
+        if (isDemoLocked) {
+          statusBadge = '<span class="text-[11px] font-tech text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-500/40">🔒 เฉพาะตัวเต็ม</span>';
+        } else if (!isUnlocked) {
+          statusBadge = '<span class="text-xs text-slate-500">🔒 ล็อก</span>';
+        } else if (isCompleted) {
+          statusBadge = `<span class="text-xs font-tech font-bold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/40">✓ ผ่าน (${score}/${isBossStage ? 10 : 5})</span>`;
+        } else {
+          statusBadge = '<span class="text-xs text-amber-400 font-tech">⚡ พร้อมท้าทาย</span>';
+        }
+
+        let buttonHtml = '';
+        if (isDemoLocked) {
+          buttonHtml = `
+            <button onclick="alert('🔒 ด่านที่ 2 ถึง 12 สงวนสิทธิ์สำหรับแพ็กเกจฉบับเต็มครับ\\nหากสนใจรับระบบเกมพร้อม Google Sheets ไปใช้ในห้องเรียน ทักแชท Inbox ได้เลยครับ!')" class="mt-4 w-full py-2 rounded-xl text-xs font-bold font-tech bg-slate-800/80 hover:bg-slate-700 text-amber-400 border border-amber-500/30 transition-all">
+              🔒 ปลดล็อกในเวอร์ชันเต็ม
+            </button>
+          `;
+        } else {
+          buttonHtml = `
+            <button 
+              onclick="startStage(${stage.id})" 
+              ${!isUnlocked ? 'disabled' : ''} 
+              class="mt-4 w-full py-2 rounded-xl text-xs font-bold font-tech transition-all ${
+                !isUnlocked 
+                  ? 'bg-slate-800 text-slate-600 cursor-not-allowed' 
+                  : isBossStage
+                    ? 'bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white shadow-md'
+                    : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950'
+              }">
+              ${!isUnlocked ? 'ยังไม่ปลดล็อก' : isCompleted ? 'เล่นซ้ำเพื่อทำคะแนนใหม่' : 'เริ่มภารกิจ ⚔️'}
+            </button>
+          `;
+        }
 
         card.innerHTML = `
           <div>
@@ -909,13 +952,7 @@
               }">
                 ${isBossStage ? '💀 ด่านบอสใหญ่' : `ด่านที่ ${stage.id}`}
               </span>
-              ${
-                !isUnlocked 
-                  ? '<span class="text-xs text-slate-500">🔒 ล็อก</span>' 
-                  : isCompleted 
-                    ? `<span class="text-xs font-tech font-bold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/40">✓ ผ่าน (${score}/${isBossStage ? 10 : 5})</span>`
-                    : '<span class="text-xs text-amber-400 font-tech">⚡ พร้อมท้าทาย</span>'
-              }
+              ${statusBadge}
             </div>
             <h3 class="font-bold text-sm md:text-base text-white mb-1">${stage.title}</h3>
             <p class="text-xs text-slate-400 mb-2">${stage.desc}</p>
@@ -923,18 +960,7 @@
               <span>บอส:</span> <span class="text-slate-300">${stage.boss}</span>
             </div>
           </div>
-          <button 
-            onclick="startStage(${stage.id})" 
-            ${!isUnlocked ? 'disabled' : ''} 
-            class="mt-4 w-full py-2 rounded-xl text-xs font-bold font-tech transition-all ${
-              !isUnlocked 
-                ? 'bg-slate-800 text-slate-600 cursor-not-allowed' 
-                : isBossStage
-                  ? 'bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white shadow-md'
-                  : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950'
-            }">
-            ${!isUnlocked ? 'ยังไม่ปลดล็อก' : isCompleted ? 'เล่นซ้ำเพื่อทำคะแนนใหม่' : 'เริ่มภารกิจ ⚔️'}
-          </button>
+          ${buttonHtml}
         `;
         grid.appendChild(card);
       });
@@ -942,6 +968,11 @@
 
     // 7. BATTLE ENGINE
     function startStage(stageId) {
+      if (IS_DEMO && stageId > 1) {
+        alert("🔒 ด่านที่ 2 ถึง 12 สงวนสิทธิ์สำหรับแพ็กเกจฉบับเต็มครับ");
+        return;
+      }
+
       currentStage = STAGES_DATA.find(s => s.id === stageId);
       currentQIndex = 0;
       stageCorrectCount = 0;
@@ -1063,8 +1094,12 @@
         currentUser.stageScores[currentStage.id] = stageCorrectCount;
       }
 
-      if (currentStage.id === currentUser.unlockedStage && currentUser.unlockedStage < 12) {
-        currentUser.unlockedStage++;
+      if (!IS_DEMO) {
+        if (currentStage.id === currentUser.unlockedStage && currentUser.unlockedStage < 12) {
+          currentUser.unlockedStage++;
+        }
+      } else {
+        currentUser.unlockedStage = 1;
       }
 
       updateTotalScoreBadge();
@@ -1074,6 +1109,13 @@
       const modal = document.getElementById('stage-clear-modal');
       const totalQ = currentStage.questions.length;
       document.getElementById('stage-score-val').innerText = `${stageCorrectCount} / ${totalQ}`;
+
+      if (IS_DEMO) {
+        document.getElementById('stage-clear-msg').innerHTML = '🎉 จบการทดสอบด่านที่ 1 (Demo) เรียบร้อยแล้ว!<br><span class="text-amber-400 font-bold mt-1 block">🔒 ด่านที่ 2 ถึง 12 สงวนสิทธิ์สำหรับเวอร์ชันเต็ม</span>';
+      } else {
+        document.getElementById('stage-clear-msg').innerText = 'คุณผ่านการทดสอบด่านนี้แล้ว';
+      }
+
       modal.classList.remove('hidden');
       modal.classList.add('flex');
     }
@@ -1089,6 +1131,11 @@
       let sum = 0;
       for (let s in currentUser.stageScores) sum += currentUser.stageScores[s];
       currentUser.totalScore = sum;
+
+      if (IS_DEMO) {
+        alert(`🎮 โหมดทดลองเล่น (Demo):\nคะแนนด่านที่ 1 ของคุณคือ ${sum}/5 คะแนน\nเกียรติบัตรและระบบวัดผลเต็ม 12 ด่าน สงวนสิทธิ์เฉพาะแพ็กเกจฉบับเต็มครับ!`);
+        return;
+      }
 
       const percentage = (sum / 65) * 100;
 
